@@ -35,7 +35,6 @@ def train(model, train_loader, criterion, optimizer, device, epoch, writer):
     return epoch_loss, epoch_acc
 
 def evaluate(model, test_loader, criterion, device, epoch, writer):
-    print(f"Test loader length: {len(test_loader)}")
     model.eval()
     running_loss = 0.0
     running_corrects = 0
@@ -78,9 +77,9 @@ def main(args):
     # Split the dataset into train, test, and validation sets
     train_dataset, test_dataset, val_dataset = split_dataset(dataset, args.test_size, args.val_size)
 
-    train_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True, num_workers=4)
-    test_loader = DataLoader(test_dataset, batch_size=args.batch_size, shuffle=False, num_workers=4)
-    val_loader = DataLoader(val_dataset, batch_size=args.batch_size, shuffle=False, num_workers=4)
+    train_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True)
+    test_loader = DataLoader(test_dataset, batch_size=args.batch_size, shuffle=False)
+    val_loader = DataLoader(val_dataset, batch_size=args.batch_size, shuffle=False)
 
     if args.model == "squeezenet":
         model = SqueezeNet(num_classes=args.num_classes).to(device)
@@ -125,7 +124,6 @@ def main(args):
         val_precisions.append(val_precision)
         val_recalls.append(val_recall)
         val_f1s.append(val_f1)
-
     plot_metrics(train_losses, train_accs, val_losses, val_accs, val_precisions, val_recalls, val_f1s, run_dir)
     torch.save(model.state_dict(), os.path.join(run_dir, "model.pth"))
     writer.flush()
@@ -143,8 +141,8 @@ def plot_metrics(train_losses, train_accs, test_losses, test_accs, test_precisio
     plt.legend()
 
     plt.subplot(1, 2, 2)
-    plt.plot(epochs, train_accs, 'b', label='Training Accuracy')
-    plt.plot(epochs, test_accs, 'r', label='Test Accuracy')
+    plt.plot(epochs, [acc.cpu() for acc in train_accs], 'b', label='Training Accuracy')
+    plt.plot(epochs, [acc.cpu() for acc in train_accs], 'r', label='Test Accuracy')
     plt.xlabel('Epochs')
     plt.ylabel('Accuracy')
     plt.legend()
