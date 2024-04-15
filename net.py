@@ -21,6 +21,26 @@ class ResNet50(nn.Module):
     def forward(self, x):
         return self.model(x)
 
+class ResNet101(nn.Module):
+    def __init__(self, num_classes):
+        super(ResNet101, self).__init__()
+        self.model = models.resnet101(weights=True)
+        num_ftrs = self.model.fc.in_features
+        self.model.fc = nn.Linear(num_ftrs, num_classes)
+
+    def forward(self, x):
+        return self.model(x)
+
+class ResNet152(nn.Module):
+    def __init__(self, num_classes):
+        super(ResNet152, self).__init__()
+        self.model = models.resnet152(weights=True)
+        num_ftrs = self.model.fc.in_features
+        self.model.fc = nn.Linear(num_ftrs, num_classes)
+
+    def forward(self, x):
+        return self.model(x)
+
 class MobileNetV2(nn.Module):
     def __init__(self, num_classes):
         super(MobileNetV2, self).__init__()
@@ -46,6 +66,26 @@ class InceptionV3(nn.Module):
         self.model = models.inception_v3(weights=True)
         num_ftrs = self.model.fc.in_features
         self.model.fc = nn.Linear(num_ftrs, num_classes)
+
+    def forward(self, x):
+        return self.model(x)
+
+class VisionTransformer(nn.Module):
+    def __init__(self, num_classes):
+        super(VisionTransformer, self).__init__()
+        self.model = models.vit_b_32(weights=True)
+        num_ftrs = self.model.heads.head.in_features
+        self.model.heads.head = nn.Linear(num_ftrs, num_classes)
+
+    def forward(self, x):
+        return self.model(x)
+
+class SwinTransformer(nn.Module):
+    def __init__(self, num_classes):
+        super(SwinTransformer, self).__init__()
+        self.model = models.swin_b(weights=True)
+        num_ftrs = self.model.head.in_features
+        self.model.head = nn.Linear(num_ftrs, num_classes)
 
     def forward(self, x):
         return self.model(x)

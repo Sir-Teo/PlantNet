@@ -5,7 +5,7 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
 from load_dataset import load_dataset, split_dataset
-from net import SqueezeNet, ResNet50, MobileNetV2, EfficientNetB0, InceptionV3
+from net import SqueezeNet, ResNet50, MobileNetV2, EfficientNetB0, InceptionV3, ResNet101, ResNet152, VisionTransformer, SwinTransformer
 from torch.utils.tensorboard import SummaryWriter
 from sklearn.metrics import precision_score, recall_score, f1_score
 import matplotlib.pyplot as plt
@@ -91,6 +91,14 @@ def main(args):
         model = EfficientNetB0(num_classes=args.num_classes).to(device)
     elif args.model == "inceptionv3":
         model = InceptionV3(num_classes=args.num_classes).to(device)
+    elif args.model == "resnet101":
+        model = ResNet101(num_classes=args.num_classes).to(device)
+    elif args.model == "resnet152":
+        model = ResNet152(num_classes=args.num_classes).to(device)
+    elif args.model == "visiontransformer":
+        model = VisionTransformer(num_classes=args.num_classes).to(device)
+    elif args.model == "swintransformer":
+        model = SwinTransformer(num_classes=args.num_classes).to(device)
     else:
         raise ValueError(f"Unsupported model: {args.model}")
 
