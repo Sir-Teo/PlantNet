@@ -36,7 +36,7 @@ def predict(model, image_path, transform, classes):
     return classes[predicted.item()]
 
 def main(args):
-    checkpoint_path = os.path.join("results", args.run_name, "best_model_epoch.pth")
+    checkpoint_path = os.path.join("results", args.run_name, "best_model.pth")
     model = load_model(args.model, args.num_classes, checkpoint_path)
     transform = transforms.Compose([
         transforms.Resize((224, 224)),
