@@ -41,20 +41,39 @@ class PlantSeedlingsDataset(Dataset):
         return len(self.samples)
 
 def load_dataset(data_dir):
-    transform = transforms.Compose([
-        transforms.Resize(256),
-        transforms.CenterCrop(224),
+    train_transform = transforms.Compose([
+        transforms.Resize((224, 224)), 
+        transforms.RandomHorizontalFlip(),
+        transforms.RandomRotation(15),
+        transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2, hue=0.1),
         transforms.ToTensor(),
         transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
     ])
+    test_transform = transforms.Compose([
+        transforms.Resize((224, 224)),  # Resize images to the same fixed size as train_transform
+        transforms.ToTensor(),
+        transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+    ])
+    dataset = PlantSeedlingsDataset(data_dir)
+    return dataset, train_transform, test_transform
 
-    dataset = PlantSeedlingsDataset(data_dir, transform=transform)
-    return dataset
+def split_dataset(dataset, test_size, val_size, train_transform, test_transform):
+    test_size = int(len(dataset) * test_size)
+    if val_size > 0:
+        val_size = int(len(dataset) * val_size)
+        train_size = len(dataset) - test_size - val_size
+        train_dataset, test_dataset, val_dataset = torch.utils.data.random_split(
+            dataset, [train_size, test_size, val_size]
+        )
+        val_dataset.dataset.transform = test_transform
+    else:
+        train_size = len(dataset) - test_size
+        train_dataset, test_dataset = torch.utils.data.random_split(
+            dataset, [train_size, test_size]
+        )
+        val_dataset = None
 
-def split_dataset(dataset, test_size, val_size):
-    test_size = int(test_size * len(dataset))
-    val_size = int(val_size * len(dataset))
-    train_size = len(dataset) - test_size - val_size
+    train_dataset.dataset.transform = train_transform
+    test_dataset.dataset.transform = test_transform
 
-    train_dataset, test_dataset, val_dataset = random_split(dataset, [train_size, test_size, val_size])
     return train_dataset, test_dataset, val_dataset
